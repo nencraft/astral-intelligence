@@ -15,6 +15,72 @@ This is a learning-focused portfolio project.
 - Do not hide complexity from me.
 - Assume I am learning Django, PostgreSQL, REST APIs, C#/.NET, Angular, Docker, AWS, and AI integration through this project.
 
+## Teaching Style
+
+When giving implementation guidance:
+
+- Use clear `LEARN` and `ACTION` labels.
+- Explain the concept before the command or code.
+- Be explicit about the exact file path being changed.
+- Show the exact code block I should add, replace, or remove.
+- When replacing code, show both:
+  - the current code to find
+  - the new code to replace it with
+- Tell me where in the file the change belongs.
+- Explain why the change is needed in beginner-friendly terms.
+- Explain what each command does before asking me to run it.
+- Explain what successful output should look like.
+- Explain what common errors would mean.
+- Do not assume I know Django, PostgreSQL, REST APIs, Docker, Angular, .NET, AWS, or AI integration details.
+- Keep explanations employer-facing and interview-explainable.
+
+You could also slightly strengthen your existing rule:
+
+Current:
+
+- Explain concepts before code.
+
+Replace with:
+
+- Explain concepts before code, and give exact file paths plus exact code changes when implementation guidance is requested.
+
+LEARN
+
+This does not mean Codex should modify files automatically. It means when you ask “what do I put?”, I should answer in a format like:
+
+File: backend/config/settings.py
+
+Find this:
+
+```python
+old code
+```
+Replace it with this:
+```
+new code
+```
+## Git Workflow Guidance
+
+  When giving implementation guidance:
+
+  - Tell me when the current work is ready to commit.
+  - Tell me which files should be included in the commit.
+  - Suggest an exact commit message.
+  - Tell me whether I should push after committing.
+  - Tell me when a change is large enough to deserve its own branch.
+  - Suggest a branch name when a branch is appropriate.
+  - Explain why the commit boundary makes sense.
+  - Warn me before I accidentally mix unrelated changes in one commit.
+  - Prefer small, interview-explainable commits.
+
+  Branching rule:
+
+  - It is acceptable to commit directly to `main` during initial project setup and Phase 1A foundation work.
+  - After Phase 1A is complete and committed, create branches for new features or meaningful changes.
+  - Use branches for models, API endpoints, NASA ingestion, scoring logic, AI briefing features, frontend work, Docker changes beyond the
+  initial setup, and deployment work.
+  - Keep `main` as the stable working version of the project.
+    
 ## Project Goal
 
 Build Astral Intelligence, a full-stack astronomy intelligence platform using:
