@@ -9,14 +9,9 @@ Astral Intelligence is a full-stack astronomy intelligence platform focused on n
 The project ingests NASA NeoWs data, stores normalized object and close-approach records in PostgreSQL, ranks close approaches with a custom C#/.NET scoring
 service, and generates AI-assisted technical briefings from verified source data.
 
-This is a learning-focused portfolio project designed to demonstrate backend development, relational modeling, REST APIs, microservice communication, AI
-integration, testing, Docker, and cloud deployment.
-
-It is not intended to be a generic chatbot, NASA image gallery, or simple API dashboard.
-
 ## Current Status
 
-Current phase: Phase 0 - Project setup and planning.
+Current phase: Phase 1 - Develop backend foundation
 
 Phase 0 is complete when:
 
