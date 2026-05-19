@@ -132,6 +132,9 @@ Rules:
 
 # Data Model Draft
 
+- Use Django internal IDs as primary keys.
+- Use `nasa_jpl_id` as the unique NASA/JPL identifier for near-Earth objects.
+
 ## NearEarthObject
 
 Fields:

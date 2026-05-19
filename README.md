@@ -11,14 +11,15 @@ service, and generates AI-assisted technical briefings from verified source data
 
 ## Current Status
 
-Current phase: Phase 1 - Develop backend foundation
+Current phase: Phase 1B - NEO domain model planning and implementation
 
-Phase 0 is complete when:
-
-- project documentation exists
-- initial architecture and roadmap are documented
-- development standards are defined
-- Phase 1 implementation scope is clear
+Completed:
+- Phase 0 project planning
+- Phase 1A Django backend foundation
+- PostgreSQL Docker Compose setup
+- DATABASE_URL-based Django database configuration
+- Initial Django migrations
+- Basic `/api/health/` endpoint
 
 ## MVP Scope
 

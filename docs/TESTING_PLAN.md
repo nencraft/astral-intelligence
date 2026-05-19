@@ -216,6 +216,13 @@ Minimum tests:
 - basic model creation
 - first simple API endpoint
 
+Phase 1B model tests:
+
+- `NearEarthObject` requires a unique `nasa_jpl_id`
+- `NearEarthObject` stores basic NASA identity fields
+- `CloseApproach` links to one `NearEarthObject`
+- duplicate NASA identifiers are rejected
+
 ### Phase 2
 
 Minimum tests:

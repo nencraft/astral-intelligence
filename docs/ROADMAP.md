@@ -34,6 +34,31 @@
 
 # Phase 1: Backend Foundation
 
+## Phase 1A: Backend Foundation Setup - Complete
+
+Completed:
+- Django project created in `backend/`
+- Django project name: `config`
+- Django app created: `neos`
+- Django REST Framework installed
+- PostgreSQL configured through Docker Compose
+- Django configured to use `DATABASE_URL`
+- Initial migrations ran against PostgreSQL
+- `/api/health/` endpoint works
+
+## Phase 1B: NEO Domain Models - Current
+
+Goal:
+- Design and implement the first minimal NEO data model.
+
+Planned:
+- `NearEarthObject`
+- `CloseApproach`
+- model constraints
+- migrations
+- admin registration
+- basic model tests
+
 ## Phase 1 Scope Decisions
 
 - Django project name: `config`
