@@ -34,8 +34,6 @@ When giving implementation guidance:
 - Do not assume I know Django, PostgreSQL, REST APIs, Docker, Angular, .NET, AWS, or AI integration details.
 - Keep explanations employer-facing and interview-explainable.
 
-You could also slightly strengthen your existing rule:
-
 Current:
 
 - Explain concepts before code.
@@ -143,14 +141,19 @@ The project must remain interview-explainable.
 
 ## Current Phase
 
-Phase 0: Project setup and planning.
+Phase 1B: NEO domain model planning and implementation.
 
-Phase 0 is complete when:
-
-- repo exists
-- project docs exist
-- AI working rules are in this file
-- initial roadmap is clear
+Phase 1A backend foundation is complete:
+- Django backend exists in `backend/`
+- Django project name is `config`
+- First Django app is `neos`
+- Django REST Framework is installed
+- PostgreSQL runs through Docker Compose
+- Django reads `DATABASE_URL`
+- Initial migrations ran successfully
+- `/api/health/` works
+- Phase 1A was committed and pushed
+- Current working branch is `feature/neo-model`
 - 
 ## Definition of Done
 
