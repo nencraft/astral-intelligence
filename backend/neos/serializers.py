@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import CloseApproach, NearEarthObject
 
+
 class NearEarthObjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = NearEarthObject

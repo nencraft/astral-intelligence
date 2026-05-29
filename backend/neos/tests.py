@@ -7,6 +7,7 @@ from rest_framework.test import APIClient
 
 from .models import CloseApproach, NearEarthObject
 
+
 class NearEarthObjectModelTests(TestCase):
     def test_near_earth_object_can_be_created(self):
         neo = NearEarthObject.objects.create(

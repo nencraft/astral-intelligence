@@ -11,15 +11,18 @@ service, and generates AI-assisted technical briefings from verified source data
 
 ## Current Status
 
-Current phase: Phase 1B - NEO domain model planning and implementation
+Current phase: Phase 2 - NASA NeoWs ingestion
 
-Completed:
-- Phase 0 project planning
-- Phase 1A Django backend foundation
-- PostgreSQL Docker Compose setup
-- DATABASE_URL-based Django database configuration
-- Initial Django migrations
-- Basic `/api/health/` endpoint
+Phase 1 completed:
+- PostgreSQL runs through Docker Compose
+- Django reads `DATABASE_URL`
+- Initial migrations ran against PostgreSQL
+- Basic `/api/health/` endpoint works
+- `NearEarthObject` and `CloseApproach` models exist
+- Models are registered in Django admin
+- Read-only API endpoints exist for NEOs and close approaches
+- Model and API tests pass
+- Manual sample data workflow is documented
 
 ## MVP Scope
 
@@ -213,10 +216,6 @@ Detailed planning docs:
 - docs/ARCHITECTURE.md
 - docs/TESTING_PLAN.md
 - docs/DEPLOYMENT_NOTES.md
-
-AI working rules:
-
-- AGENTS.md
 
 ## Project Goal
 

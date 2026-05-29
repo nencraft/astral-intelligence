@@ -137,7 +137,7 @@ Rules:
 
 ## NearEarthObject
 
-Fields:
+Current fields:
 
 - `id`
 - `nasa_jpl_id`
@@ -146,10 +146,12 @@ Fields:
 - `estimated_diameter_min_km`
 - `estimated_diameter_max_km`
 - `is_potentially_hazardous`
-- `first_observed_at`
-- `last_synced_at`
 - `created_at`
 - `updated_at`
+
+Future ingestion fields:
+- `first_observed_at`
+- `last_synced_at`
 
 ## CloseApproach
 
@@ -227,19 +229,24 @@ Fields:
 
 # Django API Endpoints
 
-Suggested V1 endpoints:
-
+Current V1 endpoints:
 ```text
+GET /api/health/
 GET /api/neos/
 GET /api/neos/{id}/
 GET /api/approaches/
+GET /api/approaches/{id}/
+```
+
+Suggested V1 endpoints:
+
+```text
 GET /api/approaches/upcoming/
 POST /api/sync/neows/
 POST /api/approaches/{id}/score/
 POST /api/approaches/{id}/briefings/
 GET /api/briefings/
 GET /api/briefings/{id}/
-GET /api/health/
 ```
 
 Suggested V1.5/V2 endpoints:

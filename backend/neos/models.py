@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class NearEarthObject(models.Model):
     nasa_jpl_id = models.CharField(max_length=32, unique=True)
     name = models.CharField(max_length=255)
@@ -30,7 +31,6 @@ class NearEarthObject(models.Model):
 
     def __str__(self):
         return self.name
-
 
 class CloseApproach(models.Model):
     near_earth_object = models.ForeignKey(
