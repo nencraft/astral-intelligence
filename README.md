@@ -11,15 +11,18 @@ service, and generates AI-assisted technical briefings from verified source data
 
 ## Current Status
 
-Current phase: Phase 1B - NEO domain model planning and implementation
+Current phase: Phase 2 - NASA NeoWs ingestion
 
-Completed:
-- Phase 0 project planning
-- Phase 1A Django backend foundation
-- PostgreSQL Docker Compose setup
-- DATABASE_URL-based Django database configuration
-- Initial Django migrations
-- Basic `/api/health/` endpoint
+Phase 1 completed:
+- PostgreSQL runs through Docker Compose
+- Django reads `DATABASE_URL`
+- Initial migrations ran against PostgreSQL
+- Basic `/api/health/` endpoint works
+- `NearEarthObject` and `CloseApproach` models exist
+- Models are registered in Django admin
+- Read-only API endpoints exist for NEOs and close approaches
+- Model and API tests pass
+- Manual sample data workflow is documented
 
 ## MVP Scope
 
@@ -152,6 +155,58 @@ POSTGRES_PASSWORD
 ```
 Do not commit .env.
 
+## Local Sample Data Workflow
+
+Phase 1 uses manual sample data instead of NASA ingestion.
+
+Start PostgreSQL:
+
+`docker compose up -d db`
+
+From backend/, set the database URL:
+
+`$env:DATABASE_URL="postgres://astral_user:astral_password@localhost:5432/astral_db"`
+
+Run migrations:
+
+`.\.venv\Scripts\python.exe manage.py migrate`
+
+Create a local admin user if needed:
+
+`.\.venv\Scripts\python.exe manage.py createsuperuser`
+
+Run the Django development server:
+
+`.\.venv\Scripts\python.exe manage.py runserver`
+
+Open the admin:
+
+http://127.0.0.1:8000/admin/
+
+Create a sample near-Earth object:
+```
+nasa_jpl_id: 3542519
+name: (2010 PK9)
+absolute_magnitude_h: 21.500
+estimated_diameter_min_km: 0.120000
+estimated_diameter_max_km: 0.270000
+is_potentially_hazardous: false
+```
+Create a sample close approach linked to that object:
+
+close_approach_date: 2026-05-29
+epoch_date_close_approach: 1780012800000
+relative_velocity_kps: 15.250000
+miss_distance_km: 7500000.123
+orbiting_body: Earth
+
+Verify the API:
+
+http://127.0.0.1:8000/api/neos/
+http://127.0.0.1:8000/api/approaches/
+
+The API should return the sample records as JSON.
+
 ## Documentation
 
 Detailed planning docs:
@@ -161,10 +216,6 @@ Detailed planning docs:
 - docs/ARCHITECTURE.md
 - docs/TESTING_PLAN.md
 - docs/DEPLOYMENT_NOTES.md
-
-AI working rules:
-
-- AGENTS.md
 
 ## Project Goal
 

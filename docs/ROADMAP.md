@@ -46,7 +46,7 @@ Completed:
 - Initial migrations ran against PostgreSQL
 - `/api/health/` endpoint works
 
-## Phase 1B: NEO Domain Models - Current
+## Phase 1B: NEO Domain Models - Complete
 
 Goal:
 - Design and implement the first minimal NEO data model.
@@ -58,6 +58,40 @@ Planned:
 - migrations
 - admin registration
 - basic model tests
+
+Completed:
+- `NearEarthObject` model
+- `CloseApproach` model
+- `nasa_jpl_id` unique constraint
+- model migration
+- Django admin registration
+- model tests
+
+## Phase 1C: Read-Only API - Complete
+
+Completed:
+- serializers for NEOs and close approaches
+- read-only DRF viewsets
+- app-level API routing
+- list/detail endpoints for NEOs
+- list/detail endpoints for close approaches
+- API tests
+
+## Phase 1D: Admin and Sample Data Workflow - Complete
+
+Completed:
+- Django admin workflow verified
+- manual sample NEO can be created
+- manual close approach can be linked to a NEO
+- API returns manually created sample records
+- README documents local sample data workflow
+
+## Phase 1E: Cleanup and Documentation - Complete
+
+Completed:
+- Phase 1 documentation updated
+- final Django checks passed
+- model and API tests passed
 
 ## Phase 1 Scope Decisions
 
@@ -99,6 +133,9 @@ Planned:
 - A basic health endpoint works
 - Initial tests pass
 - README has local setup steps
+- Read-only NEO API endpoints work
+- Model and API tests pass
+- Manual sample data workflow is documented
 
 ---
 

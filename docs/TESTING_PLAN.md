@@ -223,6 +223,20 @@ Phase 1B model tests:
 - `CloseApproach` links to one `NearEarthObject`
 - duplicate NASA identifiers are rejected
 
+Phase 1C API tests:
+
+- `GET /api/neos/` returns NEO records
+- `GET /api/neos/{id}/` returns one NEO
+- `GET /api/approaches/` returns close approach records
+- `GET /api/approaches/{id}/` returns one close approach
+
+Phase 1E final checks:
+
+- `manage.py check` passes
+- `manage.py test neos` passes
+- migrations are applied
+- manual admin sample data workflow is verified
+
 ### Phase 2
 
 Minimum tests:

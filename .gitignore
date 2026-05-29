@@ -27,3 +27,6 @@ obj/
 .DS_Store
 Thumbs.db
 docs/LEARNING_RULES.md
+
+# Private AI instructions
+AGENTS.md

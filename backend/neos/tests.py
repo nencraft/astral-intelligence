@@ -1,3 +1,129 @@
-from django.test import TestCase
+from datetime import date
+from decimal import Decimal
 
-# Create your tests here.
+from django.db import IntegrityError
+from django.test import TestCase
+from rest_framework.test import APIClient
+
+from .models import CloseApproach, NearEarthObject
+
+
+class NearEarthObjectModelTests(TestCase):
+    def test_near_earth_object_can_be_created(self):
+        neo = NearEarthObject.objects.create(
+            nasa_jpl_id="3542519",
+            name="(2010 PK9)",
+            absolute_magnitude_h=Decimal("21.500"),
+            estimated_diameter_min_km=Decimal("0.120000"),
+            estimated_diameter_max_km=Decimal("0.270000"),
+            is_potentially_hazardous=False,
+        )
+
+        self.assertEqual(neo.nasa_jpl_id, "3542519")
+        self.assertEqual(neo.name, "(2010 PK9)")
+        self.assertEqual(str(neo), "(2010 PK9)")
+        self.assertFalse(neo.is_potentially_hazardous)
+
+    def test_nasa_jpl_id_must_be_unique(self):
+        NearEarthObject.objects.create(
+            nasa_jpl_id="3542519",
+            name="(2010 PK9)",
+        )
+
+        with self.assertRaises(IntegrityError):
+            NearEarthObject.objects.create(
+                nasa_jpl_id="3542519",
+                name="Duplicate object",
+            )
+
+class CloseApproachModelTests(TestCase):
+    def test_close_approach_can_be_created_for_neo(self):
+        neo = NearEarthObject.objects.create(
+            nasa_jpl_id="3542519",
+            name="(2010 PK9)",
+        )
+
+        approach = CloseApproach.objects.create(
+            near_earth_object=neo,
+            close_approach_date=date(2026, 5, 27),
+            epoch_date_close_approach=1780012800000,
+            relative_velocity_kps=Decimal("15.250000"),
+            miss_distance_km=Decimal("7500000.123"),
+            orbiting_body="Earth",
+        )
+
+        self.assertEqual(approach.near_earth_object, neo)
+        self.assertEqual(approach.close_approach_date, date(2026, 5, 27))
+        self.assertEqual(str(approach), "(2010 PK9) - 2026-05-27")
+
+    def test_neo_can_access_related_close_approaches(self):
+        neo = NearEarthObject.objects.create(
+            nasa_jpl_id="3542519",
+            name="(2010 PK9)",
+        )
+
+        approach = CloseApproach.objects.create(
+            near_earth_object=neo,
+            close_approach_date=date(2026, 5, 27),
+        )
+
+        self.assertIn(approach, neo.close_approaches.all())
+
+
+class NearEarthObjectApiTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.neo = NearEarthObject.objects.create(
+            nasa_jpl_id="3542519",
+            name="(2010 PK9)",
+            absolute_magnitude_h=Decimal("21.500"),
+            estimated_diameter_min_km=Decimal("0.120000"),
+            estimated_diameter_max_km=Decimal("0.270000"),
+            is_potentially_hazardous=False,
+        )
+
+    def test_neo_list_endpoint_returns_neos(self):
+        response = self.client.get("/api/neos/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["nasa_jpl_id"], "3542519")
+        self.assertEqual(response.data[0]["name"], "(2010 PK9)")
+
+    def test_neo_detail_endpoint_returns_single_neo(self):
+        response = self.client.get(f"/api/neos/{self.neo.id}/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["id"], self.neo.id)
+        self.assertEqual(response.data["nasa_jpl_id"], "3542519")
+
+
+class CloseApproachApiTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.neo = NearEarthObject.objects.create(
+            nasa_jpl_id="3542519",
+            name="(2010 PK9)",
+        )
+        self.approach = CloseApproach.objects.create(
+            near_earth_object=self.neo,
+            close_approach_date=date(2026, 5, 29),
+            relative_velocity_kps=Decimal("15.250000"),
+            miss_distance_km=Decimal("7500000.123"),
+            orbiting_body="Earth",
+        )
+
+    def test_close_approach_list_endpoint_returns_approaches(self):
+        response = self.client.get("/api/approaches/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["near_earth_object"], self.neo.id)
+        self.assertEqual(response.data[0]["orbiting_body"], "Earth")
+
+    def test_close_approach_detail_endpoint_returns_single_approach(self):
+        response = self.client.get(f"/api/approaches/{self.approach.id}/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["id"], self.approach.id)
+        self.assertEqual(response.data["near_earth_object"], self.neo.id)
