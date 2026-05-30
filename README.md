@@ -1,7 +1,4 @@
 # Astral Intelligence
-
-AI-assisted near-Earth object monitoring and briefing platform.
-
 ## Overview
 
 Astral Intelligence is a full-stack astronomy intelligence platform focused on near-Earth objects.
@@ -217,19 +214,3 @@ Detailed planning docs:
 - docs/TESTING_PLAN.md
 - docs/DEPLOYMENT_NOTES.md
 
-## Project Goal
-
-The goal is to build an interview-explainable full-stack software project.
-
-The finished project should clearly demonstrate:
-
-- Django backend development
-- PostgreSQL schema design
-- NASA API ingestion and normalization
-- REST API design
-- C#/.NET microservice communication
-- AI output grounded in source data
-- Angular frontend development
-- Dockerized development
-- testing strategy
-- low-cost cloud deployment and backups
