@@ -91,8 +91,8 @@ class ApiSyncRun(models.Model):
     )
     start_date = models.DateField()
     end_date = models.DateField()
-    started_at = models.DateField(auto_now_add=True)
-    finished_at = models.DateField(
+    started_at = models.DateTimeField(auto_now_add=True)
+    finished_at = models.DateTimeField(
         null=True,
         blank=True,
     )
