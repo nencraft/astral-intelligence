@@ -72,6 +72,7 @@ def upsert_normalized_object(normalized_object, synced_at=None):
 
     return result
 
+
 def upsert_normalized_feed(normalized_objects, synced_at=None):
     result = UpsertResult()
 
