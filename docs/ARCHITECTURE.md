@@ -56,13 +56,30 @@ Responsible for:
 - sync logging
 - authentication later, if needed
 
+Current Phase 2 ingestion services inside `neos`:
+
+```text
+neos/services/neows_client.py
+neos/services/neows_normalizer.py
+neos/services/neows_upsert.py
+neos/services/sync_logger.py
+neos/management/commands/sync_neows.py
+```
+Responsibilities:
+
+- `neows_client.py`: calls NASA NeoWs Feed and handles HTTP/client errors
+- `neows_normalizer.py`: converts NASA response data into internal Python data
+- `neows_upsert.py`: creates or updates NEOs and close approaches without duplicates
+- `sync_logger.py`: records sync lifecycle and result counts
+- `sync_neows.py`: orchestrates the services through a management command
+
 Suggested Django apps:
 
-- `neos`
-- `scoring`
-- `briefings`
-- `integrations`
-- `accounts` later, not required for V1
+- neos
+- scoring
+- briefings
+- integrations
+- accounts (later)
 
 ### PostgreSQL Database
 
@@ -146,12 +163,13 @@ Current fields:
 - `estimated_diameter_min_km`
 - `estimated_diameter_max_km`
 - `is_potentially_hazardous`
+- `last_synced_at`
 - `created_at`
 - `updated_at`
 
-Future ingestion fields:
+Possible future fields:
+
 - `first_observed_at`
-- `last_synced_at`
 
 ## CloseApproach
 
@@ -166,6 +184,12 @@ Fields:
 - `orbiting_body`
 - `created_at`
 - `updated_at`
+
+Duplicate prevention:
+
+- `near_earth_object_id`
+- `epoch_date_close_approach`
+- `orbiting_body`
 
 ## AstralScore
 
@@ -207,29 +231,31 @@ Fields:
 
 - `id`
 - `source`
+- `status`
+- `start_date`
+- `end_date`
 - `started_at`
 - `finished_at`
-- `status`
 - `records_requested`
 - `records_created`
 - `records_updated`
+- `records_skipped`
 - `error_message`
 
-## WatchlistItem — V1.5 or V2
+Purpose:
 
-Fields:
-
-- `id`
-- `user_id`
-- `near_earth_object_id`
-- `created_at`
-- `notes`
+- records every NASA NeoWs sync attempt
+- stores requested date range
+- tracks success or failure
+- stores created, updated, and skipped counts
+- preserves error messages for failed syncs
 
 ---
 
 # Django API Endpoints
 
-Current V1 endpoints:
+Current backend endpoints:
+
 ```text
 GET /api/health/
 GET /api/neos/
@@ -238,7 +264,11 @@ GET /api/approaches/
 GET /api/approaches/{id}/
 ```
 
-Suggested V1 endpoints:
+Current ingestion command:
+
+`python manage.py sync_neows --start-date YYYY-MM-DD --end-date YYYY-MM-DD`
+
+Suggested future V1 endpoints:
 
 ```text
 GET /api/approaches/upcoming/

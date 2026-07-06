@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import CloseApproach, NearEarthObject
+from .models import ApiSyncRun, CloseApproach, NearEarthObject
 
 
 @admin.register(NearEarthObject)
@@ -30,3 +30,20 @@ class CloseApproachAdmin(admin.ModelAdmin):
         "near_earth_object__nasa_jpl_id",
     )
     list_filter = ("orbiting_body", "close_approach_date")
+
+@admin.register(ApiSyncRun)
+class ApiSyncRunAdmin(admin.ModelAdmin):
+    list_display = (
+        "source",
+        "status",
+        "start_date",
+        "end_date",
+        "started_at",
+        "finished_at",
+        "records_created",
+        "records_updated",
+        "records_skipped",
+    )
+    list_filter = ("source", "status", "started_at")
+    search_fields = ("source", "error_message")
+    readonly_fields = ("started_at",)

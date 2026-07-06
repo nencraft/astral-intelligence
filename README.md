@@ -8,7 +8,7 @@ service, and generates AI-assisted technical briefings from verified source data
 
 ## Current Status
 
-Current phase: Phase 2 - NASA NeoWs ingestion
+Current phase: Phase 3 - C# scoring service
 
 Phase 1 completed:
 - PostgreSQL runs through Docker Compose
@@ -20,6 +20,17 @@ Phase 1 completed:
 - Read-only API endpoints exist for NEOs and close approaches
 - Model and API tests pass
 - Manual sample data workflow is documented
+
+Phase 2 completed:
+- NASA NeoWs Feed ingestion is implemented through a Django management command
+- NeoWs API client uses `httpx`
+- NASA API key is read from `NASA_API_KEY`
+- Raw NASA Feed JSON is normalized into internal Python data
+- NEO records are upserted by `nasa_jpl_id`
+- Close approaches are upserted without duplicates
+- Sync attempts are recorded with `ApiSyncRun`
+- Ingestion tests cover client behavior, normalization, upserts, sync logging, and command
+orchestration
 
 ## MVP Scope
 
@@ -151,6 +162,33 @@ ALLOWED_HOSTS
 POSTGRES_PASSWORD
 ```
 Do not commit .env.
+
+
+## NASA NeoWs Sync
+
+Set required environment variables from `backend/`:
+
+```powershell
+$env:DATABASE_URL="postgres://astral_user:astral_password@localhost:5432/astral_db"
+$env:NASA_API_KEY="DEMO_KEY"
+```
+Run migrations:
+
+`.\.venv\Scripts\python.exe manage.py migrate`
+
+Sync a specific date range:
+
+`.\.venv\Scripts\python.exe manage.py sync_neows --start-date 2026-06-01 --end-date 2026-06-01`
+
+The command fetches NASA NeoWs Feed data, normalizes the response, upserts NEO and close-approach records, and records the sync result in ApiSyncRun.
+
+Verify synced data:
+
+http://127.0.0.1:8000/api/neos/
+http://127.0.0.1:8000/api/approaches/
+http://127.0.0.1:8000/admin/
+
+Do not commit real API keys.
 
 ## Local Sample Data Workflow
 

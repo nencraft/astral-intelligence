@@ -3,9 +3,10 @@ from decimal import Decimal
 
 from django.db import IntegrityError
 from django.test import TestCase
+from django.utils import timezone
 from rest_framework.test import APIClient
 
-from .models import CloseApproach, NearEarthObject
+from .models import ApiSyncRun, CloseApproach, NearEarthObject
 
 
 class NearEarthObjectModelTests(TestCase):
@@ -36,6 +37,17 @@ class NearEarthObjectModelTests(TestCase):
                 name="Duplicate object",
             )
 
+    def test_near_earth_object_can_store_last_synced_at(self):
+        synced_at = timezone.now()
+
+        neo = NearEarthObject.objects.create(
+            nasa_jpl_id="3542519",
+            name="(2010 PK9)",
+            last_synced_at=synced_at,
+        )
+
+        self.assertEqual(neo.last_synced_at, synced_at)
+
 class CloseApproachModelTests(TestCase):
     def test_close_approach_can_be_created_for_neo(self):
         neo = NearEarthObject.objects.create(
@@ -65,10 +77,110 @@ class CloseApproachModelTests(TestCase):
         approach = CloseApproach.objects.create(
             near_earth_object=neo,
             close_approach_date=date(2026, 5, 27),
+            epoch_date_close_approach=1780012800000,
+            orbiting_body="Earth",
         )
 
         self.assertIn(approach, neo.close_approaches.all())
 
+    def test_duplicate_close_approach_is_rejected(self):
+        neo = NearEarthObject.objects.create(
+            nasa_jpl_id="3542519",
+            name="(2010 PK9)",
+        )
+
+        CloseApproach.objects.create(
+            near_earth_object=neo,
+            close_approach_date=date(2026, 5, 27),
+            epoch_date_close_approach=1780012800000,
+            orbiting_body="Earth",
+        )
+
+        with self.assertRaises(IntegrityError):
+            CloseApproach.objects.create(
+                near_earth_object=neo,
+                close_approach_date=date(2026, 5, 27),
+                epoch_date_close_approach=1780012800000,
+                orbiting_body="Earth",
+            )
+
+    def test_same_neo_can_have_different_close_approach_epochs(self):
+        neo = NearEarthObject.objects.create(
+            nasa_jpl_id="3542519",
+            name="(2010 PK9)",
+        )
+
+        first = CloseApproach.objects.create(
+            near_earth_object=neo,
+            close_approach_date=date(2026, 5, 27),
+            epoch_date_close_approach=1780012800000,
+            orbiting_body="Earth",
+        )
+        second = CloseApproach.objects.create(
+            near_earth_object=neo,
+            close_approach_date=date(2026, 6, 1),
+            epoch_date_close_approach=1780444800000,
+            orbiting_body="Earth",
+        )
+
+        self.assertNotEqual(first.id, second.id)
+
+    def test_same_epoch_is_allowed_for_different_neos(self):
+        first_neo = NearEarthObject.objects.create(
+            nasa_jpl_id="3542519",
+            name="(2010 PK9)",
+        )
+        second_neo = NearEarthObject.objects.create(
+            nasa_jpl_id="3012398",
+            name="433 Eros",
+        )
+
+        first = CloseApproach.objects.create(
+            near_earth_object=first_neo,
+            close_approach_date=date(2026, 5, 27),
+            epoch_date_close_approach=1780012800000,
+            orbiting_body="Earth",
+        )
+        second = CloseApproach.objects.create(
+            near_earth_object=second_neo,
+            close_approach_date=date(2026, 5, 27),
+            epoch_date_close_approach=1780012800000,
+            orbiting_body="Earth",
+        )
+
+        self.assertNotEqual(first.id, second.id)
+
+class ApiSyncRunModelTests(TestCase):
+    def test_api_sync_run_can_record_success(self):
+        sync_run = ApiSyncRun.objects.create(
+            source="NASA NeoWs Feed",
+            status=ApiSyncRun.Status.SUCCESS,
+            start_date=date(2026, 5, 27),
+            end_date=date(2026, 5, 29),
+            finished_at=timezone.now(),
+            records_requested=5,
+            records_created=3,
+            records_updated=2,
+            records_skipped=0,
+        )
+
+        self.assertEqual(sync_run.status, ApiSyncRun.Status.SUCCESS)
+        self.assertEqual(sync_run.records_requested, 5)
+        self.assertEqual(sync_run.records_created, 3)
+        self.assertEqual(sync_run.records_updated, 2)
+
+    def test_api_sync_run_can_record_failure_message(self):
+        sync_run = ApiSyncRun.objects.create(
+            source="NASA NeoWs Feed",
+            status=ApiSyncRun.Status.FAILED,
+            start_date=date(2026, 5, 27),
+            end_date=date(2026, 5, 29),
+            finished_at=timezone.now(),
+            error_message="NASA API request failed",
+        )
+
+        self.assertEqual(sync_run.status, ApiSyncRun.Status.FAILED)
+        self.assertEqual(sync_run.error_message, "NASA API request failed")
 
 class NearEarthObjectApiTests(TestCase):
     def setUp(self):
@@ -108,6 +220,7 @@ class CloseApproachApiTests(TestCase):
         self.approach = CloseApproach.objects.create(
             near_earth_object=self.neo,
             close_approach_date=date(2026, 5, 29),
+            epoch_date_close_approach=1780012800000,
             relative_velocity_kps=Decimal("15.250000"),
             miss_distance_km=Decimal("7500000.123"),
             orbiting_body="Earth",

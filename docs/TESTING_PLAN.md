@@ -239,12 +239,27 @@ Phase 1E final checks:
 
 ### Phase 2
 
-Minimum tests:
+Implemented tests:
 
-- NeoWs parser
-- ingestion upsert behavior
-- sync logging
-- API failure handling
+- NeoWs client returns decoded JSON for successful mocked response
+- NeoWs client requires an API key
+- NeoWs client wraps non-success HTTP responses
+- NeoWs client wraps request failures/timeouts
+- NeoWs client can read `NASA_API_KEY` from the environment
+- NeoWs normalizer maps NASA Feed fields into internal data
+- NeoWs normalizer uses `None` for missing optional measurements
+- NeoWs normalizer rejects missing required identity fields
+- Upsert service creates NEOs and close approaches
+- Upsert service updates existing NEOs
+- Upsert service updates existing close approaches without duplicates
+- Upsert service allows multiple genuine close approaches for one NEO
+- Feed-level upsert combines created/updated counts
+- Sync logger records started, success, and failed runs
+- Management command validates required dates
+- Management command rejects invalid date formats
+- Management command rejects end date before start date
+- Management command orchestrates successful sync
+- Management command marks sync failed when a service fails
 
 ### Phase 3
 
