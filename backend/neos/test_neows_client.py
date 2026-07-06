@@ -36,7 +36,7 @@ class FetchNeoWsFeedTests(SimpleTestCase):
 
         self.assertEqual(result, expected_payload)
 
-
+    @patch.dict("os.environ", {}, clear=True)
     def test_fetch_neows_feed_requires_api_key(self):
         with self.assertRaises(NeoWsClientError):
             fetch_neows_feed(
@@ -49,7 +49,6 @@ class FetchNeoWsFeedTests(SimpleTestCase):
                     )
                 ),
             )
-
 
     def test_fetch_neows_feed_raises_client_error_for_non_success_response(self):
         def handler(request):

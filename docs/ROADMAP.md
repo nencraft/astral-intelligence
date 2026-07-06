@@ -139,27 +139,29 @@ Completed:
 
 ---
 
-# Phase 2: NASA Ingestion
+# Phase 2: NASA Ingestion - Complete
 
-## Deliverables
+## Completed
 
-- NeoWs API client
-- Sync command
-- Data normalization
-- Database upsert logic
-- Sync logging
+- NeoWs Feed API client using `httpx`
+- `sync_neows` Django management command
+- NeoWs response normalization
+- Database upsert service
+- Duplicate prevention for close approaches
+- Sync logging through `ApiSyncRun`
+- Tests for client behavior, normalization, upserts, sync logging, and command orchestration
 
 ## Definition of Done
 
-- Can run a command to pull NASA NeoWs data
+- Can run a command to pull NASA NeoWs Feed data
 - Objects and close approaches are stored cleanly
 - Repeated sync does not create duplicates
 - API failures are logged
-- Tests cover parsing, upserts, and failure handling
+- Tests cover parsing, upserts, duplicate prevention, and failure handling
 
 ---
 
-# Phase 3: C# Scoring Service
+# Phase 3 - C# Scoring Service
 
 ## Deliverables
 

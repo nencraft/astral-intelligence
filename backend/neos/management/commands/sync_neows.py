@@ -58,5 +58,3 @@ class Command(BaseCommand):
             raise CommandError(
                 f"{option_name} must use YYYY-MM-DD format"
             ) from exc
-        
-    
