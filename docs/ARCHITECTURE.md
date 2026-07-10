@@ -308,46 +308,170 @@ For `/api/neos/` and `/api/approaches/`:
 
 The Astral Priority Score is not an official NASA risk score.
 
-It is a custom portfolio-project score that ranks objects by review priority or interest level.
+It is a custom portfolio-project score that ranks near-Earth object close approaches by review priority and
+interest level.
 
-It should be transparent and explainable.
+It should be transparent, deterministic, and explainable.
+
+The score must not be described as a collision probability, danger rating, or official impact-risk
+assessment.
+
+## Model Version
+
+The initial scoring model is:
+
+```text
+APS-v1
+```
+
+Scores should include the model version that produced them.
+
+This keeps scores explainable if the scoring formula changes later.
+
+Future scoring changes should use a new version, such as `APS-v2`.
+
+## Calibration Sample
+
+APS-v1 uses fixed thresholds calibrated from a controlled NASA NeoWs Feed sample.
+
+Sample window:
+
+```text
+2026-01-08 through 2026-07-07
+```
+
+Sample size:
+
+```text
+847 close approaches
+```
+
+The thresholds are not recalculated during normal ingestion or scoring.
+
+They may be reviewed periodically, such as yearly, after enough additional NASA data has been collected to
+justify a scoring-model update.
 
 ## Inputs
 
-Potential inputs:
+The scoring service should accept one close approach at a time.
 
-- `estimated_diameter_min_km`
-- `estimated_diameter_max_km`
-- `miss_distance_km`
-- `relative_velocity_kps`
-- `is_potentially_hazardous`
-- `days_until_close_approach`
+Input fields:
+
+- `estimatedDiameterMinKm`
+- `estimatedDiameterMaxKm`
+- `missDistanceKm`
+- `relativeVelocityKps`
+- `isPotentiallyHazardous`
+- `closeApproachDate`
+
+The diameter factor should use the average of the minimum and maximum estimated diameter:
+
+```text
+averageDiameterKm = (estimatedDiameterMinKm + estimatedDiameterMaxKm) / 2
+```
+
+## Score Factors
+
+The total score is 0-100 points.
+
+```text
+diameter factor + distance factor + velocity factor + timing factor + hazard flag factor
+```
+
+Factor weights:
+
+```text
+diameter: 0-25
+distance: 0-25
+velocity: 0-20
+timing: 0-15
+hazard flag: 0-15
+```
+
+## APS-v1 Thresholds
+
+### Diameter Factor
+
+```text
+averageDiameterKm < 0.03 = 2
+0.03 to < 0.065 = 8
+0.065 to < 0.20 = 15
+0.20 to < 0.60 = 21
+>= 0.60 = 25
+```
+
+### Distance Factor
+
+Closer approaches receive more points.
+
+```text
+missDistanceKm > 57,000,000 = 2
+37,000,000 to 57,000,000 = 8
+20,000,000 to < 37,000,000 = 15
+1,000,000 to < 20,000,000 = 21
+< 1,000,000 = 25
+```
+
+### Velocity Factor
+
+```text
+relativeVelocityKps < 8 = 2
+8 to < 13 = 6
+13 to < 18 = 12
+18 to < 27 = 16
+>= 27 = 20
+```
+
+### Timing Factor
+
+The timing factor is based on how soon the close approach occurs.
+
+Past close approaches are still scoreable, but receive 0 timing points.
+
+```text
+past approach = 0
+> 365 days away = 1
+90 to 365 days away = 5
+30 to < 90 days away = 9
+7 to < 30 days away = 12
+0 to < 7 days away = 15
+```
+
+### Hazard Flag Factor
+
+```text
+isPotentiallyHazardous = false = 0
+isPotentiallyHazardous = true = 15
+```
+## Score Categories
+
+```text
+0-24: Low Interest
+25-49: Moderate Interest
+50-74: High Interest
+75-100: Critical Review
+```
 
 ## Output Shape
 
 ```json
 {
-  "score": 72,
+  "score": 63,
   "category": "High Interest",
+  "modelVersion": "APS-v1",
   "factors": {
-    "diameter": 20,
-    "distance": 24,
-    "velocity": 18,
-    "timing": 10,
+    "diameter": 21,
+    "distance": 21,
+    "velocity": 12,
+    "timing": 9,
     "hazardFlag": 0
   },
-  "explanation": "This object ranks as high interest due to its estimated size, relative velocity, and near-term approach date."
+  "explanation": "High interest due to size, miss distance, and relative velocity."
 }
 ```
 
-## Score Categories
-
-```text
-0–24: Low Interest
-25–49: Moderate Interest
-50–74: High Interest
-75–100: Critical Review
-```
+The explanation should describe why the close approach received its score without implying actual danger or
+official NASA risk.
 
 The app must use careful language and must not imply actual danger or official NASA risk.
 
