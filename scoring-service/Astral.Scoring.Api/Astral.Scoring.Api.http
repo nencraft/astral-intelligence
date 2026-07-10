@@ -1,0 +1,6 @@
+@Astral.Scoring.Api_HostAddress = http://localhost:5090
+
+GET {{Astral.Scoring.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
