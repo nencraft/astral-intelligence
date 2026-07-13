@@ -22,7 +22,7 @@ class NearEarthObject(models.Model):
         null=True,
         blank=True,
     )
-    is_potentially_hazardous = models.BooleanField(default=False)
+    is_potentially_hazardous = models.BooleanField()
     last_synced_at = models.DateTimeField(
         null=True,
         blank=True,

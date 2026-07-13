@@ -29,12 +29,14 @@ class NearEarthObjectModelTests(TestCase):
         NearEarthObject.objects.create(
             nasa_jpl_id="3542519",
             name="(2010 PK9)",
+            is_potentially_hazardous=False,
         )
 
         with self.assertRaises(IntegrityError):
             NearEarthObject.objects.create(
                 nasa_jpl_id="3542519",
                 name="Duplicate object",
+                is_potentially_hazardous=False,
             )
 
     def test_near_earth_object_can_store_last_synced_at(self):
@@ -44,6 +46,7 @@ class NearEarthObjectModelTests(TestCase):
             nasa_jpl_id="3542519",
             name="(2010 PK9)",
             last_synced_at=synced_at,
+            is_potentially_hazardous=False,
         )
 
         self.assertEqual(neo.last_synced_at, synced_at)
@@ -53,6 +56,7 @@ class CloseApproachModelTests(TestCase):
         neo = NearEarthObject.objects.create(
             nasa_jpl_id="3542519",
             name="(2010 PK9)",
+            is_potentially_hazardous=False,
         )
 
         approach = CloseApproach.objects.create(
@@ -72,6 +76,7 @@ class CloseApproachModelTests(TestCase):
         neo = NearEarthObject.objects.create(
             nasa_jpl_id="3542519",
             name="(2010 PK9)",
+            is_potentially_hazardous=False,
         )
 
         approach = CloseApproach.objects.create(
@@ -87,6 +92,7 @@ class CloseApproachModelTests(TestCase):
         neo = NearEarthObject.objects.create(
             nasa_jpl_id="3542519",
             name="(2010 PK9)",
+            is_potentially_hazardous=False,
         )
 
         CloseApproach.objects.create(
@@ -108,6 +114,7 @@ class CloseApproachModelTests(TestCase):
         neo = NearEarthObject.objects.create(
             nasa_jpl_id="3542519",
             name="(2010 PK9)",
+            is_potentially_hazardous=False,
         )
 
         first = CloseApproach.objects.create(
@@ -129,10 +136,12 @@ class CloseApproachModelTests(TestCase):
         first_neo = NearEarthObject.objects.create(
             nasa_jpl_id="3542519",
             name="(2010 PK9)",
+            is_potentially_hazardous=False,
         )
         second_neo = NearEarthObject.objects.create(
             nasa_jpl_id="3012398",
             name="433 Eros",
+            is_potentially_hazardous=False,
         )
 
         first = CloseApproach.objects.create(
@@ -216,6 +225,7 @@ class CloseApproachApiTests(TestCase):
         self.neo = NearEarthObject.objects.create(
             nasa_jpl_id="3542519",
             name="(2010 PK9)",
+            is_potentially_hazardous=False,
         )
         self.approach = CloseApproach.objects.create(
             near_earth_object=self.neo,

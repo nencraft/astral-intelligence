@@ -106,6 +106,7 @@ class UpsertNormalizedObjectTests(TestCase):
         neo = NearEarthObject.objects.create(
             nasa_jpl_id="3542519",
             name="(2010 PK9)",
+            is_potentially_hazardous=False,
         )
         existing_approach = CloseApproach.objects.create(
             near_earth_object=neo,
@@ -203,6 +204,26 @@ class UpsertNormalizedObjectTests(TestCase):
         self.assertEqual(result.objects_updated, 0)
         self.assertEqual(result.approaches_created, 2)
         self.assertEqual(result.approaches_updated, 0)
+
+    def test_upsert_normalized_object_requires_potentially_hazardous_flag(self):
+        normalized_object = {
+            "neo": {
+                "nasa_jpl_id": "3542519",
+                "name": "(2010 PK9)",
+                "absolute_magnitude_h": Decimal("21.5"),
+                "estimated_diameter_min_km": Decimal("0.12"),
+                "estimated_diameter_max_km": Decimal("0.27"),
+            },
+            "close_approaches": [],
+        }
+
+        with self.assertRaises(KeyError) as context:
+            upsert_normalized_object(normalized_object)
+
+        self.assertEqual(
+            context.exception.args[0],
+            "is_potentially_hazardous",
+        )
 
 
 class UpsertNormalizedFeedTests(TestCase):
