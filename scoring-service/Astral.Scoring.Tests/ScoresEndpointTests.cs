@@ -33,7 +33,7 @@ public class ScoresEndpointTests :
         };
 
         var response = await _client.PostAsJsonAsync(
-            "/api/scores",
+            "/api/score",
             request
         );
 
@@ -58,7 +58,7 @@ public class ScoresEndpointTests :
     public async Task PostScoresReturnsBadRequestForMissingFields()
     {
         var response = await _client.PostAsJsonAsync(
-            "/api/scores",
+            "/api/score",
             new { }
         );
 

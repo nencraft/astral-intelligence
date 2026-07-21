@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Astral.Scoring.Api.Controllers;
 
 [ApiController]
-[Route("api/scores")]
+[Route("api/score")]
 public class ScoresController : ControllerBase
 {
     private readonly ScoreCalculator _calculator;
