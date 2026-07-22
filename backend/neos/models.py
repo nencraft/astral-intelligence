@@ -1,3 +1,4 @@
+from django.core.validators import MaxValueValidator
 from django.db import models
 
 
@@ -35,6 +36,7 @@ class NearEarthObject(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class CloseApproach(models.Model):
     near_earth_object = models.ForeignKey(
@@ -75,7 +77,8 @@ class CloseApproach(models.Model):
 
     def __str__(self):
         return f"{self.near_earth_object.name} - {self.close_approach_date}"
-    
+
+
 class ApiSyncRun(models.Model):
     class Status(models.TextChoices):
         STARTED = "started", "Started"
@@ -107,3 +110,61 @@ class ApiSyncRun(models.Model):
 
     def __str__(self):
         return f"{self.source} sync - {self.status} - {self.started_at}"
+
+
+class AstralScore(models.Model):
+    class Category(models.TextChoices):
+        LOW_INTEREST = "Low Interest"
+        MODERATE_INTEREST = "Moderate Interest"
+        HIGH_INTEREST = "High Interest"
+        CRITICAL_REVIEW = "Critical Review"
+
+    close_approach = models.ForeignKey(
+        CloseApproach,
+        on_delete=models.CASCADE,
+        related_name="scores",
+    )
+    score = models.PositiveSmallIntegerField(
+        validators=[MaxValueValidator(100)],
+    )
+    category = models.CharField(
+        max_length=32,
+        choices=Category.choices,
+    )
+    model_version = models.CharField(
+        max_length=32,
+    )
+    diameter_factor = models.PositiveSmallIntegerField(
+        validators=[MaxValueValidator(25)],
+    )
+    distance_factor = models.PositiveSmallIntegerField(
+        validators=[MaxValueValidator(25)],
+    )
+    velocity_factor = models.PositiveSmallIntegerField(
+        validators=[MaxValueValidator(20)],
+    )
+    timing_factor = models.PositiveSmallIntegerField(
+        validators=[MaxValueValidator(15)],
+    )
+    hazard_flag_factor = models.PositiveSmallIntegerField(
+        validators=[MaxValueValidator(15)],
+    )
+    explanation = models.TextField()
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=[
+                    "close_approach",
+                    "model_version",
+                ],
+                name="unique_score_per_approach_model_version",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.close_approach} - {self.model_version} - {self.score}"

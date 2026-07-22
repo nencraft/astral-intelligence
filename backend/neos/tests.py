@@ -1,12 +1,13 @@
 from datetime import date
 from decimal import Decimal
 
+from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.test import TestCase
 from django.utils import timezone
 from rest_framework.test import APIClient
 
-from .models import ApiSyncRun, CloseApproach, NearEarthObject
+from .models import ApiSyncRun, CloseApproach, NearEarthObject, AstralScore
 
 
 class NearEarthObjectModelTests(TestCase):
@@ -250,3 +251,88 @@ class CloseApproachApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["id"], self.approach.id)
         self.assertEqual(response.data["near_earth_object"], self.neo.id)
+
+
+class AstralScoreModelTests(TestCase):
+    def setUp(self):
+        self.neo = NearEarthObject.objects.create(
+            nasa_jpl_id="3542519",
+            name="(2010 PK9)",
+            is_potentially_hazardous=False,
+        )
+        self.approach = CloseApproach.objects.create(
+            near_earth_object=self.neo,
+            close_approach_date=date(2026, 5, 29),
+            epoch_date_close_approach=1780012800000,
+            relative_velocity_kps=Decimal("15.250000"),
+            miss_distance_km=Decimal("7500000.123"),
+            orbiting_body="Earth",
+        )
+        self.astral_score = AstralScore.objects.create(
+            close_approach=self.approach,
+            score=81,
+            category=AstralScore.Category.CRITICAL_REVIEW,
+            model_version="APS-v1",
+            diameter_factor=21,
+            distance_factor=21,
+            velocity_factor=12,
+            timing_factor=12,
+            hazard_flag_factor=15,
+            explanation="This is a test explanation.",
+        )
+
+    def test_astral_score_can_be_created_for_close_approach(self):
+        self.assertEqual(
+            self.astral_score.close_approach,
+            self.approach,
+        )
+        self.assertEqual(self.astral_score.score, 81)
+        self.assertIn(
+            self.astral_score,
+            self.approach.scores.all(),
+        )
+        self.assertIn("APS-v1", str(self.astral_score))
+
+    def test_duplicate_model_version_for_approach_is_rejected(self):
+        with self.assertRaises(IntegrityError):
+            AstralScore.objects.create(
+                close_approach=self.approach,
+                score=81,
+                category=AstralScore.Category.CRITICAL_REVIEW,
+                model_version="APS-v1",
+                diameter_factor=21,
+                distance_factor=21,
+                velocity_factor=12,
+                timing_factor=12,
+                hazard_flag_factor=15,
+                explanation="This is a test explanation for duplicates.",
+            )
+
+    def test_same_approach_can_store_different_model_versions(self):
+        second_score = AstralScore.objects.create(
+            close_approach=self.approach,
+            score=81,
+            category=AstralScore.Category.CRITICAL_REVIEW,
+            model_version="APS-v2",
+            diameter_factor=21,
+            distance_factor=21,
+            velocity_factor=12,
+            timing_factor=12,
+            hazard_flag_factor=15,
+            explanation="This is a test explanation for duplicates.",
+        )
+
+        self.assertNotEqual(self.astral_score.id, second_score.id)
+        self.assertEqual(self.approach.scores.count(), 2)
+
+    def test_score_above_100_fails_validation(self):
+        self.astral_score.score = 101
+
+        with self.assertRaises(ValidationError):
+            self.astral_score.full_clean()
+
+    def test_invalid_category_fails_validation(self):
+        self.astral_score.category = "DANGEROUS"
+
+        with self.assertRaises(ValidationError):
+            self.astral_score.full_clean()

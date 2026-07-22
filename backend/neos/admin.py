@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import ApiSyncRun, CloseApproach, NearEarthObject
+from .models import ApiSyncRun, AstralScore, CloseApproach, NearEarthObject
 
 
 @admin.register(NearEarthObject)
@@ -31,6 +31,7 @@ class CloseApproachAdmin(admin.ModelAdmin):
     )
     list_filter = ("orbiting_body", "close_approach_date")
 
+
 @admin.register(ApiSyncRun)
 class ApiSyncRunAdmin(admin.ModelAdmin):
     list_display = (
@@ -47,3 +48,22 @@ class ApiSyncRunAdmin(admin.ModelAdmin):
     list_filter = ("source", "status", "started_at")
     search_fields = ("source", "error_message")
     readonly_fields = ("started_at",)
+
+
+@admin.register(AstralScore)
+class AstralScoreAdmin(admin.ModelAdmin):
+    list_display = (
+        "close_approach",
+        "score",
+        "category",
+        "model_version",
+        "created_at",
+        "updated_at",
+    )
+    list_filter = ("category", "model_version", "created_at")
+    search_fields = (
+        "close_approach__near_earth_object__name",
+        "close_approach__near_earth_object__nasa_jpl_id",
+        "model_version",
+    )
+    readonly_fields = ("created_at", "updated_at")
