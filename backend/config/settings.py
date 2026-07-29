@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
+import os
 from pathlib import Path
 
 import dj_database_url
@@ -118,3 +119,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+SCORING_SERVICE_URL = os.environ.get(
+    "SCORING_SERVICE_URL",
+    "http://localhost:5090",
+).rstrip("/")
+
+SCORING_SERVICE_TIMEOUT_SECONDS = float(
+    os.environ.get(
+        "SCORING_SERVICE_TIMEOUT_SECONDS",
+        "5",
+    )
+)
