@@ -14,10 +14,10 @@ class RequestScoreTests(SimpleTestCase):
     )
     def test_request_score_posts_payload_and_returns_decoded_response(self):
         request_payload = {
-            "estimatedDiameterMinKm": "0.200000",
-            "estimatedDiameterMaxKm": "0.400000",
-            "missDistanceKm": "10000000.000",
-            "relativeVelocityKps": "15.000000",
+            "estimatedDiameterMinKm": 0.200000,
+            "estimatedDiameterMaxKm": 0.400000,
+            "missDistanceKm": 10000000.000,
+            "relativeVelocityKps": 15.000000,
             "isPotentiallyHazardous": True,
             "closeApproachDate": "2026-08-10",
         }
@@ -88,7 +88,7 @@ class RequestScoreTests(SimpleTestCase):
         with self.assertRaises(ScoringClientError) as context:
             request_score(
                 payload,
-                client=client
+                client=client,
             )
 
         self.assertIn("500", str(context.exception))
