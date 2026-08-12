@@ -30,10 +30,7 @@ def upsert_normalized_object(normalized_object, synced_at=None):
         "estimated_diameter_max_km": neo_data.get(
             "estimated_diameter_max_km"
         ),
-        "is_potentially_hazardous": neo_data.get(
-            "is_potentially_hazardous",
-            False,
-        ),
+        "is_potentially_hazardous": neo_data["is_potentially_hazardous"],
         "last_synced_at": synced_at,
     }
 

@@ -161,24 +161,35 @@ Completed:
 
 ---
 
-# Phase 3 - C# Scoring Service
+# Phase 3: C# Scoring Service - Complete
 
-## Deliverables
+## Completed
 
-- ASP.NET Core API
-- Score endpoint
-- Health endpoint
-- Unit tests
-- Dockerfile
-- Django integration
+- APS-v1 scoring model with fixed, documented thresholds
+- ASP.NET Core scoring API
+- `POST /api/score` scoring endpoint
+- `GET /health` health endpoint
+- Request validation and factor-level score explanations
+- xUnit calculation, validation, category, and endpoint tests
+- Multistage scoring-service Dockerfile
+- Docker Compose scoring service
+- Django `AstralScore` persistence model
+- Django scoring payload construction
+- Django scoring HTTP client using `httpx`
+- Scoring-response validation and normalization
+- Version-aware score creation and updates
+- `score_approach` Django management command
+- Failure handling for missing data, HTTP failures, and invalid responses
 
 ## Definition of Done
 
-- C# service runs locally
-- `POST /api/score` returns score, category, and factor breakdown
+- C# service runs locally and through Docker Compose
+- `POST /api/score` returns score, category, model version, factors, and explanation
 - `GET /health` works
-- xUnit tests cover score and category behavior
-- Django can call scoring service and save result
+- xUnit tests cover scoring, boundaries, validation, and endpoints
+- Django calls the scoring service and persists validated results
+- Repeated scoring updates the same close-approach and model-version row
+- Different scoring-model versions can be retained separately
 
 ---
 

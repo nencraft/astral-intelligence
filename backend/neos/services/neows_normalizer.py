@@ -58,9 +58,9 @@ def normalize_neo(raw_neo):
             "estimated_diameter_max_km": to_optional_decimal(
                 diameter_km.get("estimated_diameter_max")
             ),
-            "is_potentially_hazardous": raw_neo.get(
+            "is_potentially_hazardous": require_field(
+                raw_neo,
                 "is_potentially_hazardous_asteroid",
-                False,
             ),
         },
         "close_approaches": [

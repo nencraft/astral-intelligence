@@ -154,3 +154,22 @@ class NormalizeFeedTests(SimpleTestCase):
 
         with self.assertRaises(NeoWsNormalizationError):
             normalize_feed(payload)
+
+    def test_normalize_feed_requires_potentially_hazardous_flag(self):
+        payload = {
+            "near_earth_objects": {
+                "2026-06-08": [
+                    {
+                        "id": "3542519",
+                        "name": "(2010 PK9)",
+                        "close_approach_data": [],
+                    }
+                ]
+            },
+        }
+
+        with self.assertRaisesRegex(
+            NeoWsNormalizationError,
+            "is_potentially_hazardous_asteroid",
+        ):
+            normalize_feed(payload)
