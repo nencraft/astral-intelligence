@@ -73,6 +73,24 @@ Responsibilities:
 - `sync_logger.py`: records sync lifecycle and result counts
 - `sync_neows.py`: orchestrates the services through a management command
 
+Current Phase 3 scoring integration inside `neos`:
+
+```text
+neos/services/scoring_payload.py
+neos/services/scoring_client.py
+neos/services/scoring_response.py
+neos/services/scoring_service.py
+neos/management/commands/score_approach.py
+```
+
+Responsibilities:
+
+- `scoring_payload.py`: builds a JSON-compatible scoring request from stored NEO and close-approach data
+- `scoring_client.py`: calls the C# scoring service and translates transport failures
+- `scoring_response.py`: validates and normalizes the scoring response
+- `scoring_service.py`: orchestrates scoring and persists versioned AstralScore results
+- `score_approach.py`: exposes the scoring workflow as a Django management command
+
 Suggested Django apps:
 
 - neos
@@ -193,20 +211,26 @@ Duplicate prevention:
 
 ## AstralScore
 
-Fields:
+Current fields:
 
 - `id`
-- `near_earth_object_id`
 - `close_approach_id`
 - `score`
 - `category`
+- `model_version`
 - `diameter_factor`
 - `distance_factor`
 - `velocity_factor`
 - `timing_factor`
 - `hazard_flag_factor`
 - `explanation`
-- `scored_at`
+- `created_at`
+- `updated_at`
+
+Duplicate prevention:
+
+- `close_approach_id`
+- `model_version`
 
 ## AIBriefing
 
@@ -267,6 +291,10 @@ GET /api/approaches/{id}/
 Current ingestion command:
 
 `python manage.py sync_neows --start-date YYYY-MM-DD --end-date YYYY-MM-DD`
+
+Current scoring command:
+
+`python manage.py score_approach --approach-id ID`
 
 Suggested future V1 endpoints:
 

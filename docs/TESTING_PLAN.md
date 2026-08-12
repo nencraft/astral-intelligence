@@ -263,12 +263,33 @@ Implemented tests:
 
 ### Phase 3
 
-Minimum tests:
+Implemented C# tests:
 
-- C# score calculation
-- C# category boundaries
-- C# validation
-- Django scoring client with mocked service response
+- request-model validation
+- diameter, distance, velocity, timing, and hazardous-factor boundaries
+- total score calculation
+- category boundaries
+- complete scoring response
+- health endpoint
+- successful score endpoint response
+- invalid score request response
+
+Implemented Django tests:
+
+- `AstralScore` creation and relationships
+- model-version uniqueness and version history
+- score and category validation
+- scoring client request shape
+- timeout, HTTP failure, and invalid JSON handling
+- scoring payload mapping and missing-data rejection
+- zero miss distance handling
+- scoring response shape, type, range, total, and category validation
+- successful score creation
+- same-version score update
+- different-version score history
+- failure paths do not persist scores
+- scoring management-command argument validation
+- scoring command success output and failure translation
 
 ### Phase 4
 
