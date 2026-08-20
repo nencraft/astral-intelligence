@@ -3,11 +3,12 @@ from decimal import Decimal
 
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
+from django.db.models.deletion import ProtectedError
 from django.test import TestCase
 from django.utils import timezone
 from rest_framework.test import APIClient
 
-from .models import ApiSyncRun, CloseApproach, NearEarthObject, AstralScore
+from .models import ApiSyncRun, CloseApproach, NearEarthObject, AstralScore, AIBriefing
 
 
 class NearEarthObjectModelTests(TestCase):
@@ -51,6 +52,7 @@ class NearEarthObjectModelTests(TestCase):
         )
 
         self.assertEqual(neo.last_synced_at, synced_at)
+
 
 class CloseApproachModelTests(TestCase):
     def test_close_approach_can_be_created_for_neo(self):
@@ -160,6 +162,7 @@ class CloseApproachModelTests(TestCase):
 
         self.assertNotEqual(first.id, second.id)
 
+
 class ApiSyncRunModelTests(TestCase):
     def test_api_sync_run_can_record_success(self):
         sync_run = ApiSyncRun.objects.create(
@@ -191,6 +194,7 @@ class ApiSyncRunModelTests(TestCase):
 
         self.assertEqual(sync_run.status, ApiSyncRun.Status.FAILED)
         self.assertEqual(sync_run.error_message, "NASA API request failed")
+
 
 class NearEarthObjectApiTests(TestCase):
     def setUp(self):
@@ -336,3 +340,147 @@ class AstralScoreModelTests(TestCase):
 
         with self.assertRaises(ValidationError):
             self.astral_score.full_clean()
+
+
+class AIBriefingModelTests(TestCase):
+    def setUp(self):
+        self.neo = NearEarthObject.objects.create(
+            nasa_jpl_id="3542519",
+            name="(2010 PK9)",
+            is_potentially_hazardous=False,
+        )
+        self.approach = CloseApproach.objects.create(
+            near_earth_object=self.neo,
+            close_approach_date=date(2026, 5, 29),
+            epoch_date_close_approach=1780012800000,
+            relative_velocity_kps=Decimal("15.250000"),
+            miss_distance_km=Decimal("7500000.123"),
+            orbiting_body="Earth",
+        )
+        self.astral_score = AstralScore.objects.create(
+            close_approach=self.approach,
+            score=81,
+            category=AstralScore.Category.CRITICAL_REVIEW,
+            model_version="APS-v1",
+            diameter_factor=21,
+            distance_factor=21,
+            velocity_factor=12,
+            timing_factor=12,
+            hazard_flag_factor=15,
+            explanation="This is a test explanation.",
+        )
+
+    def test_ai_briefing_can_be_created_for_astral_score(self):
+        briefing = AIBriefing.objects.create(
+            astral_score=self.astral_score,
+            briefing_type=AIBriefing.BriefingType.TECHNICAL,
+            provider="OpenAI",
+            model_name="test-model",
+            prompt_version="briefing-v1",
+            plain_english_summary=(
+                "This object is scheduled to pass Earth and received "
+                "a high Astral score for further review."
+            ),
+            technical_summary=(
+                "The object has a recorded miss distance of "
+                "7,500,000.123 km and relative velocity of 15.250000 km/s."
+            ),
+            risk_context=(
+                "The Astral score is a prioritization metric and does not "
+                "represent an impact probability."
+            ),
+            data_caveats=[
+                "Estimated diameter is a range rather than an exact measurement."
+            ],
+            source_data_snapshot={
+                "score": 81,
+                "model_version": "APS-v1",
+            },
+        )
+
+        self.assertEqual(briefing.astral_score, self.astral_score)
+        self.assertIn(
+            briefing,
+            self.astral_score.briefings.all(),
+        )
+        self.assertIn(
+            "Estimated diameter is a range rather than an exact measurement.",
+            briefing.data_caveats,
+        )
+        self.assertEqual(briefing.source_data_snapshot["score"], 81)
+        self.assertIn(
+            "OpenAI",
+            str(briefing),
+        )
+
+    def test_same_astral_score_can_have_multiple_briefings(self):
+        first_briefing = AIBriefing.objects.create(
+            astral_score=self.astral_score,
+            briefing_type=AIBriefing.BriefingType.TECHNICAL,
+            provider="OpenAI",
+            model_name="test-model-v1",
+            prompt_version="briefing-v1",
+            plain_english_summary="First summary.",
+            technical_summary="First technical summary.",
+            risk_context="First risk context.",
+            data_caveats=[],
+            source_data_snapshot={
+                "score": 81,
+                "model_version": "APS-v1",
+            },
+        )
+        second_briefing = AIBriefing.objects.create(
+            astral_score=self.astral_score,
+            briefing_type=AIBriefing.BriefingType.TECHNICAL,
+            provider="OpenAI",
+            model_name="test-model-v2",
+            prompt_version="briefing-v1",
+            plain_english_summary="Second summary.",
+            technical_summary="Second technical summary.",
+            risk_context="Second risk context.",
+            data_caveats=[],
+            source_data_snapshot={
+                "score": 81,
+                "model_version": "APS-v1",
+            },
+        )
+
+        self.assertNotEqual(
+            first_briefing.id,
+            second_briefing.id,
+        )
+        self.assertEqual(
+            self.astral_score.briefings.count(),
+            2,
+        )
+
+    def test_astral_score_with_briefing_cannot_be_deleted(self):
+        briefing = AIBriefing.objects.create(
+            astral_score=self.astral_score,
+            briefing_type=AIBriefing.BriefingType.TECHNICAL,
+            provider="OpenAI",
+            model_name="test-model",
+            prompt_version="briefing-v1",
+            plain_english_summary="Test summary.",
+            technical_summary="Test technical summary.",
+            risk_context="Test risk context.",
+            data_caveats=[],
+            source_data_snapshot={
+                "score": 81,
+                "model_version": "APS-v1",
+            },
+        )
+
+        with self.assertRaises(ProtectedError):
+            self.astral_score.delete()
+
+        self.assertTrue(
+            AstralScore.objects.filter(
+                id=self.astral_score.id,
+            ).exists()
+        )
+        self.assertTrue(
+            AIBriefing.objects.filter(
+                id=briefing.id,
+            ).exists()
+        )

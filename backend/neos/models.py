@@ -168,3 +168,46 @@ class AstralScore(models.Model):
 
     def __str__(self):
         return f"{self.close_approach} - {self.model_version} - {self.score}"
+
+
+class AIBriefing(models.Model):
+    class BriefingType(models.TextChoices):
+        TECHNICAL = "technical", "Technical"
+
+    astral_score = models.ForeignKey(
+        AstralScore,
+        on_delete=models.PROTECT,
+        related_name="briefings",
+    )
+    briefing_type = models.CharField(
+        max_length=32,
+        choices=BriefingType.choices,
+    )
+    provider = models.CharField(
+        max_length=64,
+    )
+    model_name = models.CharField(
+        max_length=128,
+    )
+    prompt_version = models.CharField(
+        max_length=32,
+    )
+    plain_english_summary = models.TextField()
+    technical_summary = models.TextField()
+    risk_context = models.TextField()
+    data_caveats = models.JSONField(
+        default=list,
+    )
+    source_data_snapshot = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return (
+            f"{self.astral_score.close_approach} - "
+            f"{self.briefing_type} - "
+            f"{self.provider} - "
+            f"{self.model_name}"
+        )

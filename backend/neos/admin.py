@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import ApiSyncRun, AstralScore, CloseApproach, NearEarthObject
+from .models import ApiSyncRun, AstralScore, CloseApproach, NearEarthObject, AIBriefing
 
 
 @admin.register(NearEarthObject)
@@ -67,3 +67,30 @@ class AstralScoreAdmin(admin.ModelAdmin):
         "model_version",
     )
     readonly_fields = ("created_at", "updated_at")
+
+
+@admin.register(AIBriefing)
+class AIBriefingAdmin(admin.ModelAdmin):
+    list_display = (
+        "astral_score",
+        "briefing_type",
+        "provider",
+        "model_name",
+        "prompt_version",
+        "created_at",
+    )
+    list_filter = (
+        "briefing_type",
+        "provider",
+        "model_name",
+        "prompt_version",
+        "created_at",
+    )
+    search_fields = (
+        "astral_score__close_approach__near_earth_object__name",
+        "astral_score__close_approach__near_earth_object__nasa_jpl_id",
+        "provider",
+        "model_name",
+        "prompt_version",
+    )
+    readonly_fields = ("created_at",)
