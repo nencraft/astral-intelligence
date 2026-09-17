@@ -134,31 +134,6 @@ Django REST API
 PostgreSQL Database
 ```
 
-## Phase 1 Scope
-
-Phase 1 will build the backend foundation.
-
-Planned Phase 1 decisions:
-
-- Django project name: `config`
-- First Django app: `neos`
-- Use Django REST Framework from the start
-- Use PostgreSQL through Docker Compose
-- Use real but minimal models:
-  - `NearEarthObject`
-  - `CloseApproach`
-- First endpoint: `GET /api/health/`
-- Initial read-only API endpoints:
-  - `GET /api/neos/`
-  - `GET /api/neos/{id}/`
-  - `GET /api/approaches/`
-- Use `pytest` and `pytest-django`
-- Use `requirements.txt` for Python dependencies
-- Keep NASA ingestion out of Phase 1
-- Keep C# scoring out of Phase 1
-- Keep AI briefings out of Phase 1
-- Use Django admin only; no user auth yet
-
 ## Environment Variables
 
 Environment variables:
@@ -241,58 +216,6 @@ POST http://localhost:5090/api/score
 
 The score is a deterministic review-priority ranking for this portfolio project. It is not an official NASA risk
 score, collision probability, or impact prediction.
-
-## Local Sample Data Workflow
-
-Phase 1 uses manual sample data instead of NASA ingestion.
-
-Start PostgreSQL:
-
-`docker compose up -d db`
-
-From backend/, set the database URL:
-
-`$env:DATABASE_URL="postgres://astral_user:astral_password@localhost:5432/astral_db"`
-
-Run migrations:
-
-`.\.venv\Scripts\python.exe manage.py migrate`
-
-Create a local admin user if needed:
-
-`.\.venv\Scripts\python.exe manage.py createsuperuser`
-
-Run the Django development server:
-
-`.\.venv\Scripts\python.exe manage.py runserver`
-
-Open the admin:
-
-http://127.0.0.1:8000/admin/
-
-Create a sample near-Earth object:
-```
-nasa_jpl_id: 3542519
-name: (2010 PK9)
-absolute_magnitude_h: 21.500
-estimated_diameter_min_km: 0.120000
-estimated_diameter_max_km: 0.270000
-is_potentially_hazardous: false
-```
-Create a sample close approach linked to that object:
-
-close_approach_date: 2026-05-29
-epoch_date_close_approach: 1780012800000
-relative_velocity_kps: 15.250000
-miss_distance_km: 7500000.123
-orbiting_body: Earth
-
-Verify the API:
-
-http://127.0.0.1:8000/api/neos/
-http://127.0.0.1:8000/api/approaches/
-
-The API should return the sample records as JSON.
 
 ## Documentation
 
